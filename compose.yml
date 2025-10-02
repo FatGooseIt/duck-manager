@@ -1,0 +1,57 @@
+services:
+  duck-manager-php-fpm:
+    container_name: duck-manager-php-fpm
+    build:
+      context: ./.docker
+      dockerfile: ./php-fpm/Dockerfile
+    volumes:
+      - './app:/var/www/app:rw'
+    environment:
+      XDEBUG_CONFIG: "remote_host=192.168.221.1 remote_enable=1"
+      PHP_IDE_CONFIG: "serverName=duckManager"
+    networks:
+      - duck-manager-network
+  duck-manager-nginx:
+    image: nginx:latest
+    container_name: duck-manager-nginx
+    ports:
+      - "8096:80"
+    volumes:
+      - "$PWD/app:/var/www/app:rw"
+      - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - duck-manager-php-fpm
+    networks:
+      - duck-manager-network
+    restart: unless-stopped
+  duck-manager-php-cli:
+    build:
+      context: ./.docker
+      dockerfile: ./php-cli/Dockerfile
+    container_name: duck-manager-php-cli
+    volumes:
+      - "$PWD/app:/var/www/app:rw"
+      - "$PWD/.data/composer:/root/.composer/cache"
+    environment:
+      XDEBUG_CONFIG: "remote_host=192.168.221.1 remote_enable=1"
+      PHP_IDE_CONFIG: "serverName=duckManager"
+    networks:
+      - duck-manager-network
+  duck-manager-mysql:
+    container_name: duck-manager-mysql
+    image: mysql:8.4.3
+    volumes:
+      - "./.data/db/mysql8:/var/lib/mysql"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+      MYSQL_DATABASE: duck_manager
+    ports:
+      - "33076:3306"
+    networks:
+      - duck-manager-network
+
+networks:
+  duck-manager-network:
+    driver: bridge
