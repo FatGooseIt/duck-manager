@@ -1,1 +1,2 @@
-# duck-manager
+### Build application:
+    make init

@@ -1,0 +1,14 @@
+includes:
+	- vendor/phpstan/phpstan-doctrine/extension.neon
+	- vendor/phpstan/phpstan-symfony/extension.neon
+parameters:
+    level: 9
+    paths:
+        - src/
+    ignoreErrors:
+            -
+                message: '#in iterable type#'
+                identifier: missingType.iterableValue
+            -
+                message: '#never returns (.+) so it can be removed from the return type#'
+                identifier: return.unusedType
