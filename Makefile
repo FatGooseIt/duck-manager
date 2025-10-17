@@ -14,8 +14,6 @@ docker-down:
 docker-down-clear:
 	docker compose down -v --remove-orphans
 
-app-init: app-clear-var-cache composer-install
-
 app-clear-var-cache:
 	docker compose run --rm duck-manager-php-fpm rm -rf /var/www/app/var/cache
 
